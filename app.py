@@ -1,9 +1,19 @@
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, jsonify, render_template
 import joblib
 import numpy as np
 import os
 
+# Map numeric predictions to flower class labels
+label_map = {
+    0: "Iris-setosa",
+    1: "Iris-versicolor",
+    2: "Iris-virginica"
+}
+
+# Set correct template folder path
 app = Flask(__name__, template_folder="templates")
+
+# Load model from Week5 folder
 model = joblib.load("model.pkl")
 
 @app.route('/')
@@ -14,8 +24,10 @@ def home():
 def predict():
     try:
         data = [float(x) for x in request.form.values()]
-        prediction = model.predict([data])
-        return render_template("index.html", prediction_text=f"Prediction: {prediction[0]}")
+        final_features = np.array([data])
+        prediction = model.predict(final_features)
+        label = label_map.get(prediction[0], "Unknown")
+        return render_template("index.html", prediction_text=f"Prediction: {label}")
     except Exception as e:
         return jsonify({"error": str(e)})
 
