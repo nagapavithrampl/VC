@@ -1,9 +1,13 @@
 from flask import Flask, request, jsonify, render_template
 import joblib
 import numpy as np
+import os
 
-app = Flask(__name__, template_folder="Week5/templates")
-model = joblib.load("Week5/model.pkl")
+# Flask app setup
+app = Flask(__name__, template_folder="templates")
+
+# Load model (model.pkl is now inside Week5/)
+model = joblib.load("model.pkl")
 
 @app.route('/')
 def home():
@@ -19,8 +23,7 @@ def predict():
     except Exception as e:
         return jsonify({"error": str(e)})
 
-import os
-
+# Run app on Heroku port
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
