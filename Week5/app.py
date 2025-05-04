@@ -3,10 +3,17 @@ import joblib
 import numpy as np
 import os
 
-# Flask app setup
+# Map numeric predictions to flower class labels
+label_map = {
+    0: "Iris-setosa",
+    1: "Iris-versicolor",
+    2: "Iris-virginica"
+}
+
+# Set correct template folder path
 app = Flask(__name__, template_folder="templates")
 
-# Load model (model.pkl is now inside Week5/)
+# Load model from Week5 folder
 model = joblib.load("model.pkl")
 
 @app.route('/')
@@ -19,11 +26,11 @@ def predict():
         data = [float(x) for x in request.form.values()]
         final_features = np.array([data])
         prediction = model.predict(final_features)
-        return render_template("index.html", prediction_text=f"Prediction: {prediction[0]}")
+        label = label_map.get(prediction[0], "Unknown")
+        return render_template("index.html", prediction_text=f"Prediction: {label}")
     except Exception as e:
         return jsonify({"error": str(e)})
 
-# Run app on Heroku port
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
